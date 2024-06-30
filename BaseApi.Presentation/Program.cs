@@ -1,7 +1,33 @@
+using BaseApi.Core;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
 //Add For Api:1
 builder.Services.AddControllers();//ASP.NET Core MVC (Model-View-Controller) altyapýsýný uygulamanýza dahil etmek için kullanýlýr. 
+
+
+// Bearer token authentication :1 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
+        };
+    });
+
+
+//Bearer token authentication for JWT token servis :2
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 //Swagger : 1
 //Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -22,6 +48,11 @@ app.UseHttpsRedirection();
 
 //Add For Api:2
 app.MapControllers(); //ASP.NET Core uygulamasýnda HTTP isteklerini API kontrollerine yönlendirmek için kullanýlan bir yöntemdir
+
+
+// Bearer token authentication :3
+app.UseAuthentication();
+app.UseAuthorization();
 
 
 app.Run();
