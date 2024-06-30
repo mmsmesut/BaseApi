@@ -1,7 +1,5 @@
 using BaseApi.Core;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using BaseApi.Presentation.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,21 +8,8 @@ builder.Services.AddControllers();//ASP.NET Core MVC (Model-View-Controller) alt
 
 
 // Bearer token authentication :1 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
-        };
-    });
-
+// Use the extension method to configure JWT Bearer authentication
+builder.Services.AddJwtBearerAuthentication(builder.Configuration);
 
 //Bearer token authentication for JWT token servis :2
 builder.Services.AddScoped<ITokenService, TokenService>();
