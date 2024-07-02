@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BaseApi.Core;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BaseApi.Presentation.Controllers
 {
@@ -10,9 +11,10 @@ namespace BaseApi.Presentation.Controllers
     {
 
         [HttpGet]//https://localhost:7018/api/Home
-        public ActionResult<string> Get()
+        public ActionResult<Response<string>> Get()
         {
-            return "Hello World from Web API!ss";
+            var response = new Response<string>("Hello world from web api!", 200);
+            return Ok(response);
         }
 
         [HttpGet]
